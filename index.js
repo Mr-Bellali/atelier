@@ -89,4 +89,41 @@ app.get('/post', async (req, res) => {
     res.send(posts);
 })
 
+app.get("/posts", async (req, res) => {
+    const posts = await prisma.post.findMany({
+    select: {
+    title: true,
+    content: true,
+    User: {
+    select: {
+    name: true,
+    },
+    },
+    },
+    });
+    res.send(posts);
+    });
+    
+    app.get("/usersGmail", async (req, res) => {
+    const users = await prisma.user.findMany({
+    where: {
+    email: {
+    endsWith: "@gmail.com",
+    },
+    },
+    });
+    res.send(users);
+    });
+    
+    //Comptez le nombre des posts de chaque utilisateur.
+    app.get("/usersPostsCount", async (req, res) => {
+    const usersCount = await prisma.post.groupBy({
+    by: ["published"],
+    _count: {
+    id: true,
+    },
+    });
+    res.send(usersCount);
+    });
+
 app.listen(5000);
